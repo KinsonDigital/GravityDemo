@@ -59,7 +59,11 @@ namespace GravityTesting
         /// <param name="dragCoefficient"></param>
         /// <param name="surfaceAreaInContact"></param>
         /// <param name="velocityOnSingleAxis"></param>
-        /// <remarks>Refer to http://www.softschools.com/formulas/physics/air_resistance_formula/85/ for information.</remarks>
+        /// <remarks>
+        /// Refer to links
+        /// 1. http://www.softschools.com/formulas/physics/air_resistance_formula/85/ for information.
+        /// 2. https://www.khanacademy.org/computing/computer-programming/programming-natural-simulations/programming-forces/a/air-and-fluid-resistance
+        /// </remarks>
         /// <returns></returns>
         public static float CalculateDragForceOnObject(float fluidDensity, float dragCoefficient, float surfaceAreaInContact, float velocityOnSingleAxis)
         {
