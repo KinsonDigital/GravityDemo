@@ -144,7 +144,7 @@ namespace GravityTesting
              */
             var newAccelerationY = allForces / _mass;
 
-            var averageAccelerationY = 0.5f * (newAccelerationY + _accelerationY);
+            var averageAccelerationY = Util.Average(new[] { newAccelerationY, _accelerationY });
 
             _velocityY += averageAccelerationY * _deltaTime;
 

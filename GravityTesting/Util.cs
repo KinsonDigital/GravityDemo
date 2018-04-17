@@ -17,5 +17,17 @@ namespace GravityTesting
         {
             return value * value;
         }
+
+        public static float Average(float[] values)
+        {
+            var sum = 0f;
+
+            for (int i = 0; i < values.Length; i++)
+            {
+                sum += values[i];
+            }
+
+            return sum / values.Length;
+        }
     }
 }
