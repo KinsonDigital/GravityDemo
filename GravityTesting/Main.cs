@@ -5,7 +5,10 @@ using System;
 
 namespace GravityTesting
 {
-    /*NOTE: http://buildnewgames.com/gamephysics/ is the website that this comes from*/
+    /*Resources/Links:
+     1. http://buildnewgames.com/gamephysics/ is the website that this comes from
+     2. https://www.youtube.com/channel/UCF6F8LdCSWlRwQm_hfA2bcQ Good videos on coding with math
+     */
 
     /// <summary>
     /// This is the main type for your game.
@@ -121,14 +124,18 @@ namespace GravityTesting
                 3. Multiplying _velocityY * _velocityY is the same thing as _velocity^2 which is in the well known equation in the link below
             */
             http://www.softschools.com/formulas/physics/air_resistance_formula/85/
-            allForces += -1 * 0.5f * _density * _dragCoeffecient * _A * _velocityY * _velocityY;
+            allForces += -1 * ((_density * _dragCoeffecient * _A) / 2.0f) * Util.Squared(_velocityY);
 
             /* Verlet integration for the y-direction
              * This is the amount the ball will be moving in this frame based on the ball's current velocity and acceleration. 
+             * Part 1: https://www.youtube.com/watch?v=3HjO_RGIjCU
+             * Part 2: https://www.youtube.com/watch?v=pBMivz4rIJY
+             * Refer to C++ code sample and the velocity_verlet() function
+             *      https://leios.gitbooks.io/algorithm-archive/content/chapters/physics_solvers/verlet/verlet.html
             */
             var predictedDeltaY = _velocityY * _deltaTime + (0.5f * _accelerationY * _deltaTime * _deltaTime);
 
-            // The following calculation is because the math assumes meters but we're assuming 1 cm per pixel, so we need to scale the results
+            // The following calculation converts the unit of measure from cm per pixel to meters per pixel
             _y += predictedDeltaY * 100f;
 
             /*Update the acceleration in the Y direction to take in effect all of the added forces as well as the mass
@@ -137,7 +144,7 @@ namespace GravityTesting
              */
             var newAccelerationY = allForces / _mass;
 
-            var averageAccelerationY = 0.5f * (newAccelerationY + _accelerationY);
+            var averageAccelerationY = Util.Average(new[] { newAccelerationY, _accelerationY });
 
             _velocityY += averageAccelerationY * _deltaTime;
 
