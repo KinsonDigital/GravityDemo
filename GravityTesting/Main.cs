@@ -121,7 +121,7 @@ namespace GravityTesting
                 3. Multiplying _velocityY * _velocityY is the same thing as _velocity^2 which is in the well known equation in the link below
             */
             http://www.softschools.com/formulas/physics/air_resistance_formula/85/
-            allForces += -1 * 0.5f * _density * _dragCoeffecient * _A * _velocityY * _velocityY;
+            allForces += -1 * ((_density * _dragCoeffecient * _A) / 2.0f) * Util.Squared(_velocityY);
 
             /* Verlet integration for the y-direction
              * This is the amount the ball will be moving in this frame based on the ball's current velocity and acceleration. 

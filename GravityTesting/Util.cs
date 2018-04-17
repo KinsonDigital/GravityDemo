@@ -12,5 +12,10 @@ namespace GravityTesting
         {
             return mass * acceleration;
         }
+
+        public static float Squared(float value)
+        {
+            return value * value;
+        }
     }
 }
