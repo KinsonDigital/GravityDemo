@@ -5,7 +5,10 @@ using System;
 
 namespace GravityTesting
 {
-    /*NOTE: http://buildnewgames.com/gamephysics/ is the website that this comes from*/
+    /*Resources/Links:
+     1. http://buildnewgames.com/gamephysics/ is the website that this comes from
+     2. https://www.youtube.com/channel/UCF6F8LdCSWlRwQm_hfA2bcQ Good videos on coding with math
+     */
 
     /// <summary>
     /// This is the main type for your game.
@@ -125,10 +128,14 @@ namespace GravityTesting
 
             /* Verlet integration for the y-direction
              * This is the amount the ball will be moving in this frame based on the ball's current velocity and acceleration. 
+             * Part 1: https://www.youtube.com/watch?v=3HjO_RGIjCU
+             * Part 2: https://www.youtube.com/watch?v=pBMivz4rIJY
+             * Refer to C++ code sample and the velocity_verlet() function
+             *      https://leios.gitbooks.io/algorithm-archive/content/chapters/physics_solvers/verlet/verlet.html
             */
             var predictedDeltaY = _velocityY * _deltaTime + (0.5f * _accelerationY * _deltaTime * _deltaTime);
 
-            // The following calculation is because the math assumes meters but we're assuming 1 cm per pixel, so we need to scale the results
+            // The following calculation converts the unit of measure from cm per pixel to meters per pixel
             _y += predictedDeltaY * 100f;
 
             /*Update the acceleration in the Y direction to take in effect all of the added forces as well as the mass
