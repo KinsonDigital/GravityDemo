@@ -133,7 +133,7 @@ namespace GravityTesting
              * Refer to C++ code sample and the velocity_verlet() function
              *      https://leios.gitbooks.io/algorithm-archive/content/chapters/physics_solvers/verlet/verlet.html
             */
-            var predictedDeltaY = _velocityY * _deltaTime + (0.5f * _accelerationY * _deltaTime * _deltaTime);
+            var predictedDeltaY = Util.IntegrateVelocityVerlet(_velocityY, _deltaTime, _accelerationY);
 
             // The following calculation converts the unit of measure from cm per pixel to meters per pixel
             _y += predictedDeltaY * 100f;

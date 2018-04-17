@@ -29,5 +29,17 @@ namespace GravityTesting
 
             return sum / values.Length;
         }
+
+        /// <summary>
+        /// This performs a verlet velocity integration on a single axis.
+        /// </summary>
+        /// <param name="velOnSingleAxis">The velocity on a single axis.  Must be the same axis as the <paramref name="accelerationOnSingleAxis"/> param.</param>
+        /// <param name="dt">The delta time in seconds of the current frame.</param>
+        /// <param name="accelerationOnSingleAxis">The current accerlation on a single axis.  Must be the same axis as the <paramref name="velOnSingleAxis"/> param.</param>
+        /// <returns></returns>
+        public static float IntegrateVelocityVerlet(float velOnSingleAxis, float dt, float accelerationOnSingleAxis)
+        {
+            return velOnSingleAxis * dt + (0.5f * accelerationOnSingleAxis * Squared(dt));
+        }
     }
 }
