@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using System;
 
 namespace GravityTesting
@@ -21,34 +20,19 @@ namespace GravityTesting
         private int _screenHeight;
         private int _screenWidth;
 
-        //-----------------------------------
         private Vector2 _position = new Vector2(200, 0f);//NEW
-        //private float _x = 200f;//This is the objects position in the x direction//OLD
-        //private float _y = 0f;//This is the objects position in the y direction//OLD
-        //-----------------------------------
-
-        //-----------------------------------
         private Vector2 _velocity = new Vector2(0, 0);//NEW
-        //private float _velocityY = 0f; //This is the objects velocity only in the y-direction//OLD
-        //-----------------------------------
-
-        //-----------------------------------
         private Vector2 _acceleration = new Vector2();//NEW
-        //private float _accelerationY = 0f;//This is the objects acceleration only in the y-direction//OLD
-        //-----------------------------------
 
         private float _mass = 0.1f;    // Ball mass in kg
         private float _radius = 50f;     // Ball radius in cm; or pixels.
         private float _deltaTime = 0.02f;  // Time step in the units of seconds
 
-        //-----------------------------------
         /*This is the amount(constant) of gravitational pull that earth has.
           This number represents the rate that objects accelerate towards earth at 
           a rate of 9.807 m/s^2(meters/second squared) due to the force of gravity.
          */
         private Vector2 _gravity = new Vector2(0, 9.807f);//NEW
-        //private float _gravity = 9.807f;//OLD
-        //-----------------------------------
 
         /* Coefficient of restitution ("bounciness"). Needs to be a negative number for flipping the direction of travel (velocity Y) to move the ball 
            in the opposition direction when it hits a surface. This is what simulates the bouncing effect of an object hitting another object.
@@ -68,11 +52,6 @@ namespace GravityTesting
 
         public Main()
         {
-            var vector = new Vector2(2, 2);
-
-            var result = vector * vector;
-
-            //--------
             _A = (float)Math.PI * _radius * _radius / 50000f;
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -132,7 +111,7 @@ namespace GravityTesting
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            var allForces = new Vector2();//I think fy stands for force Y
+            var allForces = new Vector2();//Total forces.  Gravity + air/fluid drag + etc....
 
             //Add the weight force, which only affects the y-direction (because that's the direction gravity is pulling from)
             //https://www.wikihow.com/Calculate-Force-of-Gravity
@@ -160,7 +139,6 @@ namespace GravityTesting
 
             // The following calculation converts the unit of measure from cm per pixel to meters per pixel
             _position += predictedDelta * 100f;
-            //_y += predictedDeltaY * 100f;//OLD
 
             /*Update the acceleration in the Y direction to take in effect all of the added forces as well as the mass
              Find the new acceleration of the object in the Y direction by solving for A(Accerlation) by dividing all
