@@ -14,6 +14,7 @@ namespace GravityTesting
     /// </summary>
     public class Main : Game
     {
+        private ScreenStats _screenStats;
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private int _screenHeight;
@@ -90,6 +91,14 @@ namespace GravityTesting
         /// </summary>
         protected override void LoadContent()
         {
+            _screenStats = new ScreenStats(Content);
+            _screenStats.AddStatText(new StatText()
+            {
+                Name = "Velocity",
+                Text = "X: 0, Y: 0",
+                Forecolor = Color.Black
+            });
+
             _spriteBatch = new SpriteBatch(GraphicsDevice);
         }
 
@@ -116,7 +125,14 @@ namespace GravityTesting
 
             CheckCollision();
 
+            UpdateStats();
+
             base.Update(gameTime);
+        }
+
+        private void UpdateStats()
+        {
+            _screenStats.UpdateStat("Velocity", $"X: {Math.Round(_velocity.X, 2)} , Y:{Math.Round(_velocity.Y, 2)}");
         }
 
 
@@ -131,6 +147,8 @@ namespace GravityTesting
             _spriteBatch.Begin();
 
             _spriteBatch.FillRectangle(_position, new Vector2(100, 100), Color.Orange);
+
+            _screenStats.Draw(_spriteBatch);
 
             _spriteBatch.End();
 
