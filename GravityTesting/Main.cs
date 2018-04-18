@@ -19,8 +19,9 @@ namespace GravityTesting
         private SpriteBatch _spriteBatch;
         private Texture2D _box;
         private int _screenHeight;
-        private float _x = 200f;//This is the objects position in the x direction
-        private float _y = 0f;//This is the objects position in the y direction
+        private Vector2 _position = new Vector2(200, 0f);
+        //private float _x = 200f;//This is the objects position in the x direction
+        //private float _y = 0f;//This is the objects position in the y direction
         private float _velocityY = 0f; //This is the objects velocity only in the y-direction
         private float _accelerationY = 0f;//This is the objects acceleration only in the y-direction
         private float _mass = 0.1f;    // Ball mass in kg
@@ -136,7 +137,8 @@ namespace GravityTesting
             var predictedDeltaY = Util.IntegrateVelocityVerlet(_velocityY, _deltaTime, _accelerationY);
 
             // The following calculation converts the unit of measure from cm per pixel to meters per pixel
-            _y += predictedDeltaY * 100f;
+            _position.Y += predictedDeltaY * 100f;
+            //_y += predictedDeltaY * 100f;//OLD
 
             /*Update the acceleration in the Y direction to take in effect all of the added forces as well as the mass
              Find the new acceleration of the object in the Y direction by solving for A(Accerlation) by dividing all
@@ -149,14 +151,14 @@ namespace GravityTesting
             _velocityY += averageAccelerationY * _deltaTime;
 
             //Let's do very simple collision detection
-            if (_y + _radius > _screenHeight && _velocityY > 0)
+            if (_position.Y + _radius > _screenHeight && _velocityY > 0)
             {
                 // This is a simplification of impulse-momentum collision response. e should be a negative number, which will change the velocity's direction
                 _velocityY *= _restitutionCoeffecient;
 
                 // Move the ball back a little bit so it's not still "stuck" in the wall
                 //This is just for this demo.  This simulates a collision response to separate the ball from the wall.
-                _y = _screenHeight - _radius;
+                _position.Y = _screenHeight - _radius;
             }
 
             base.Update(gameTime);
@@ -173,7 +175,7 @@ namespace GravityTesting
 
             _spriteBatch.Begin();
 
-            _spriteBatch.Draw(_box, new Vector2(_x, _y), Color.White);
+            _spriteBatch.Draw(_box, new Vector2(_position.X, _position.Y), Color.White);
 
             _spriteBatch.End();
 
