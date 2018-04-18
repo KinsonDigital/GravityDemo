@@ -65,11 +65,7 @@ namespace GravityTesting
         //TODO: Convert name of accelerationOnSingleAxis param to something that makes sense to the context of a vector
         public static Vector2 IntegrateVelocityVerlet(Vector2 velOnSingleAxis, float dt, Vector2 accelerationOnSingleAxis)
         {
-            return new Vector2()
-            {
-                X = velOnSingleAxis.X * dt + (0.5f * accelerationOnSingleAxis.X * Squared(dt)),
-                Y = velOnSingleAxis.Y * dt + (0.5f * accelerationOnSingleAxis.Y * Squared(dt))
-            };
+            return velOnSingleAxis *dt + (0.5f * accelerationOnSingleAxis * Squared(dt));
         }
 
 
