@@ -20,27 +20,27 @@ namespace GravityTesting
         private int _screenHeight;
         private int _screenWidth;
 
-        private Vector2 _position = new Vector2(200, 0f);//NEW
-        private Vector2 _velocity = new Vector2(0, 0);//NEW
-        private Vector2 _acceleration = new Vector2();//NEW
+        private Vector2 _position = new Vector2(350, 200f);
+        private Vector2 _velocity = new Vector2(0, 0);
+        private Vector2 _acceleration = new Vector2();
 
-        private float _mass = 0.1f;    // Ball mass in kg
-        private float _radius = 50f;     // Ball radius in cm; or pixels.
-        private float _deltaTime = 0.02f;  // Time step in the units of seconds
+        private float _mass = 0.1f;//Ball mass in kg
+        private float _radius = 50f;//Ball radius in cm; or pixels.
+        private float _deltaTime = 0.02f;//Time step in the units of seconds
 
         /*This is the amount(constant) of gravitational pull that earth has.
           This number represents the rate that objects accelerate towards earth at 
           a rate of 9.807 m/s^2(meters/second squared) due to the force of gravity.
          */
-        private Vector2 _gravity = new Vector2(0, 9.807f);//NEW
+        private Vector2 _gravity = new Vector2(9.807f, 9.807f);
 
         /* Coefficient of restitution ("bounciness"). Needs to be a negative number for flipping the direction of travel (velocity Y) to move the ball 
            in the opposition direction when it hits a surface. This is what simulates the bouncing effect of an object hitting another object.
         */
         private float _restitutionCoeffecient = -0.5f;
 
-        private float _density = 1.2f;  // Density of air. Try 1000 for water.
-        private float _dragCoeffecient = 0.47f; // Coeffecient of drag for a ball
+        private float _density = 1.2f;//Density of air. Try 1000 for water.
+        private float _dragCoeffecient = 0.47f;//Coeffecient of drag for a ball
 
         /* Frontal area of the ball; divided by 10000 to compensate for the 1px = 1cm relation
            frontal area of the ball is the area of the ball as projected opposite of the direction of motion.
@@ -150,17 +150,18 @@ namespace GravityTesting
 
             _velocity += averageAcceleration * _deltaTime;
 
-            //Let's do very simple collision detection on the Y axis
-            if (_position.Y + _radius > _screenHeight && _velocity.Y > 0)
+            //Let's do very simple collision detection for the left of the screen
+            if (_position.X < 0 && _velocity.X < 0)
             {
                 // This is a simplification of impulse-momentum collision response. e should be a negative number, which will change the velocity's direction
-                _velocity.Y *= _restitutionCoeffecient;
+                _velocity.X *= _restitutionCoeffecient;
 
                 // Move the ball back a little bit so it's not still "stuck" in the wall
                 //This is just for this demo.  This simulates a collision response to separate the ball from the wall.
-                _position.Y = _screenHeight - _radius;
+                _position.X = 0;
             }
 
+            //Let's do very simple collision detection for the right of the screen
             if (_position.X + _radius > _screenWidth && _velocity.X > 0)
             {
                 // This is a simplification of impulse-momentum collision response. e should be a negative number, which will change the velocity's direction
@@ -169,6 +170,28 @@ namespace GravityTesting
                 // Move the ball back a little bit so it's not still "stuck" in the wall
                 //This is just for this demo.  This simulates a collision response to separate the ball from the wall.
                 _position.X = _screenWidth - _radius;
+            }
+
+            //Let's do very simple collision detection for the top of the screen
+            if (_position.Y < 0 && _velocity.Y < 0)
+            {
+                // This is a simplification of impulse-momentum collision response. e should be a negative number, which will change the velocity's direction
+                _velocity.Y *= _restitutionCoeffecient;
+
+                // Move the ball back a little bit so it's not still "stuck" in the wall
+                //This is just for this demo.  This simulates a collision response to separate the ball from the wall.
+                _position.Y = 0;
+            }
+
+            //Let's do very simple collision detection for the bottom of the screen
+            if (_position.Y + _radius > _screenHeight && _velocity.Y > 0)
+            {
+                // This is a simplification of impulse-momentum collision response. e should be a negative number, which will change the velocity's direction
+                _velocity.Y *= _restitutionCoeffecient;
+
+                // Move the ball back a little bit so it's not still "stuck" in the wall
+                //This is just for this demo.  This simulates a collision response to separate the ball from the wall.
+                _position.Y = _screenHeight - _radius;
             }
 
             base.Update(gameTime);
