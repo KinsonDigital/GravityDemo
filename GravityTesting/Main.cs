@@ -19,6 +19,7 @@ namespace GravityTesting
         private SpriteBatch _spriteBatch;
         private Texture2D _box;
         private int _screenHeight;
+        private int _screenWidth;
 
         //-----------------------------------
         private Vector2 _position = new Vector2(200, 0f);//NEW
@@ -56,7 +57,7 @@ namespace GravityTesting
            It is the total area of the ball that faces the wind. In short: this is the area that the air is pressing on.
            http://www.softschools.com/formulas/physics/air_resistance_formula/85/
         */
-        private float _A = 0f; 
+        private float _A = 0f;
 
         public Main()
         {
@@ -78,6 +79,7 @@ namespace GravityTesting
             _graphics.ApplyChanges();
 
             _screenHeight = _graphics.PreferredBackBufferHeight;
+            _screenWidth = _graphics.PreferredBackBufferWidth;
 
             var screenCenterX = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2;
             var screenCenterY = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2;
@@ -158,7 +160,7 @@ namespace GravityTesting
 
             _velocity.Y += averageAccelerationY * _deltaTime;
 
-            //Let's do very simple collision detection
+            //Let's do very simple collision detection on the Y axis
             if (_position.Y + _radius > _screenHeight && _velocity.Y > 0)
             {
                 // This is a simplification of impulse-momentum collision response. e should be a negative number, which will change the velocity's direction
@@ -167,6 +169,16 @@ namespace GravityTesting
                 // Move the ball back a little bit so it's not still "stuck" in the wall
                 //This is just for this demo.  This simulates a collision response to separate the ball from the wall.
                 _position.Y = _screenHeight - _radius;
+            }
+
+            if (_position.X + _radius > _screenWidth && _velocity.X > 0)
+            {
+                // This is a simplification of impulse-momentum collision response. e should be a negative number, which will change the velocity's direction
+                _velocity.X *= _restitutionCoeffecient;
+
+                // Move the ball back a little bit so it's not still "stuck" in the wall
+                //This is just for this demo.  This simulates a collision response to separate the ball from the wall.
+                _position.X = _screenWidth - _radius;
             }
 
             base.Update(gameTime);
