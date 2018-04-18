@@ -19,10 +19,18 @@ namespace GravityTesting
         private SpriteBatch _spriteBatch;
         private Texture2D _box;
         private int _screenHeight;
-        private Vector2 _position = new Vector2(200, 0f);
-        //private float _x = 200f;//This is the objects position in the x direction
-        //private float _y = 0f;//This is the objects position in the y direction
-        private float _velocityY = 0f; //This is the objects velocity only in the y-direction
+
+        //-----------------------------------
+        private Vector2 _position = new Vector2(200, 0f);//NEW
+        //private float _x = 200f;//This is the objects position in the x direction//OLD
+        //private float _y = 0f;//This is the objects position in the y direction//OLD
+        //-----------------------------------
+
+        //-----------------------------------
+        private Vector2 _velocity = new Vector2(0, 0);//NEW
+        //private float _velocityY = 0f; //This is the objects velocity only in the y-direction//OLD
+        //-----------------------------------
+
         private float _accelerationY = 0f;//This is the objects acceleration only in the y-direction
         private float _mass = 0.1f;    // Ball mass in kg
         private float _radius = 50f;     // Ball radius in cm; or pixels.
@@ -125,7 +133,7 @@ namespace GravityTesting
                 3. Multiplying _velocityY * _velocityY is the same thing as _velocity^2 which is in the well known equation in the link below
             */
             http://www.softschools.com/formulas/physics/air_resistance_formula/85/
-            allForces += Util.CalculateDragForceOnObject(_density, _dragCoeffecient, _A, _velocityY);
+            allForces += Util.CalculateDragForceOnObject(_density, _dragCoeffecient, _A, _velocity.Y);
 
             /* Verlet integration for the y-direction
              * This is the amount the ball will be moving in this frame based on the ball's current velocity and acceleration. 
@@ -134,7 +142,7 @@ namespace GravityTesting
              * Refer to C++ code sample and the velocity_verlet() function
              *      https://leios.gitbooks.io/algorithm-archive/content/chapters/physics_solvers/verlet/verlet.html
             */
-            var predictedDeltaY = Util.IntegrateVelocityVerlet(_velocityY, _deltaTime, _accelerationY);
+            var predictedDeltaY = Util.IntegrateVelocityVerlet(_velocity.Y, _deltaTime, _accelerationY);
 
             // The following calculation converts the unit of measure from cm per pixel to meters per pixel
             _position.Y += predictedDeltaY * 100f;
@@ -148,13 +156,13 @@ namespace GravityTesting
 
             var averageAccelerationY = Util.Average(new[] { newAccelerationY, _accelerationY });
 
-            _velocityY += averageAccelerationY * _deltaTime;
+            _velocity.Y += averageAccelerationY * _deltaTime;
 
             //Let's do very simple collision detection
-            if (_position.Y + _radius > _screenHeight && _velocityY > 0)
+            if (_position.Y + _radius > _screenHeight && _velocity.Y > 0)
             {
                 // This is a simplification of impulse-momentum collision response. e should be a negative number, which will change the velocity's direction
-                _velocityY *= _restitutionCoeffecient;
+                _velocity.Y *= _restitutionCoeffecient;
 
                 // Move the ball back a little bit so it's not still "stuck" in the wall
                 //This is just for this demo.  This simulates a collision response to separate the ball from the wall.
