@@ -67,5 +67,37 @@ namespace GravityTesting
             text.Name += ": ";
             _statItems.Add(text);
         }
+
+
+        /// <summary>
+        /// Changes the <see cref="Color"/> of the stat that matches the given <paramref name="name"/>.
+        /// </summary>
+        /// <param name="name">The name of the stat to change.</param>
+        /// <param name="color">The color to set the stat to.</param>
+        public void ChangeStatColor(string name, Color color)
+        {
+            var statText = GetStatText(name);
+
+            statText.Forecolor = color;
+        }
+
+
+        #region Private Methods
+        /// <summary>
+        /// Gets the index of a stat that matches the given <paramref name="name"/>.
+        /// </summary>
+        /// <param name="name">The name of the stat to find.</param>
+        /// <returns></returns>
+        private StatText GetStatText(string name)
+        {
+            for (int i = 0; i < _statItems.Count; i++)
+            {
+                if (_statItems[i].Name.Replace(": ", "") == name)
+                    return _statItems[i];
+            }
+
+            return new StatText();
+        }
+        #endregion
     }
 }
