@@ -114,6 +114,8 @@ namespace GravityTesting
 
             UpdatePhysics(frameTime);
 
+            CheckCollision();
+
             base.Update(gameTime);
         }
 
@@ -182,7 +184,13 @@ namespace GravityTesting
             var averageAcceleration = Util.Average(new[] { newAcceleration, _acceleration });
 
             _velocity += averageAcceleration * frameTime;
+        }
 
+        /// <summary>
+        /// Checks collision with the edges of the screen.
+        /// </summary>
+        private void CheckCollision()
+        {
             //Let's do very simple collision detection for the left of the screen
             if (_position.X < 0 && _velocity.X < 0)
             {
@@ -226,12 +234,6 @@ namespace GravityTesting
                 //This is just for this demo.  This simulates a collision response to separate the ball from the wall.
                 _position.Y = _screenHeight - _radius;
             }
-
-        }
-
-        private void CheckCollision()
-        {
-
         }
         #endregion
     }
