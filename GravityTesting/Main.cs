@@ -25,7 +25,6 @@ namespace GravityTesting
 
         private float _mass = 0.1f;//Ball mass in kg
         private float _radius = 50f;//Ball radius in cm; or pixels.
-        private float _deltaTime = 0.02f;//Time step in the units of seconds
 
         /*This is the amount(constant) of gravitational pull that earth has.
           This number represents the rate that objects accelerate towards earth at 
@@ -51,12 +50,15 @@ namespace GravityTesting
 
         public Main()
         {
+            //Make this game loop a variable time step
+            IsFixedTimeStep = false;
+
             _surfaceArea = (float)Math.PI * _radius * _radius / 50000f;
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
 
-
+        #region MonoGame Methods
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
         /// This is where it can query for any required services and load any non-graphic
@@ -108,6 +110,42 @@ namespace GravityTesting
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            var frameTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            UpdatePhysics(frameTime);
+
+            CheckCollision();
+
+            base.Update(gameTime);
+        }
+
+
+        /// <summary>
+        /// This is called when the game should draw itself.
+        /// </summary>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        protected override void Draw(GameTime gameTime)
+        {
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+
+            _spriteBatch.Begin();
+
+            _spriteBatch.FillRectangle(_position, new Vector2(100, 100), Color.Orange);
+
+            _spriteBatch.End();
+
+            base.Draw(gameTime);
+        }
+        #endregion
+
+
+        #region Private Methods
+        /// <summary>
+        /// Updates the physics using the given <paramref name="frameTime"/>.
+        /// </summary>
+        /// <param name="frameTime">The time in seconds since the last frame.</param>
+        private void UpdatePhysics(float frameTime)
+        {
             var allForces = new Vector2();//Total forces.  Gravity + air/fluid drag + etc....
 
             //Add the weight force, which only affects the y-direction (because that's the direction gravity is pulling from)
@@ -132,7 +170,7 @@ namespace GravityTesting
              * Refer to C++ code sample and the velocity_verlet() function
              *      https://leios.gitbooks.io/algorithm-archive/content/chapters/physics_solvers/verlet/verlet.html
             */
-            var predictedDelta = Util.IntegrateVelocityVerlet(_velocity, _deltaTime, _acceleration);
+            var predictedDelta = Util.IntegrateVelocityVerlet(_velocity, frameTime, _acceleration);
 
             // The following calculation converts the unit of measure from cm per pixel to meters per pixel
             _position += predictedDelta * 100f;
@@ -145,8 +183,14 @@ namespace GravityTesting
 
             var averageAcceleration = Util.Average(new[] { newAcceleration, _acceleration });
 
-            _velocity += averageAcceleration * _deltaTime;
+            _velocity += averageAcceleration * frameTime;
+        }
 
+        /// <summary>
+        /// Checks collision with the edges of the screen.
+        /// </summary>
+        private void CheckCollision()
+        {
             //Let's do very simple collision detection for the left of the screen
             if (_position.X < 0 && _velocity.X < 0)
             {
@@ -190,26 +234,7 @@ namespace GravityTesting
                 //This is just for this demo.  This simulates a collision response to separate the ball from the wall.
                 _position.Y = _screenHeight - _radius;
             }
-
-            base.Update(gameTime);
         }
-
-
-        /// <summary>
-        /// This is called when the game should draw itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Draw(GameTime gameTime)
-        {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            _spriteBatch.Begin();
-
-            _spriteBatch.FillRectangle(_position, new Vector2(100, 100), Color.Orange);
-
-            _spriteBatch.End();
-
-            base.Draw(gameTime);
-        }
+        #endregion
     }
 }
