@@ -112,6 +112,38 @@ namespace GravityTesting
         {
             var frameTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
+            UpdatePhysics(frameTime);
+
+            base.Update(gameTime);
+        }
+
+
+        /// <summary>
+        /// This is called when the game should draw itself.
+        /// </summary>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        protected override void Draw(GameTime gameTime)
+        {
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+
+            _spriteBatch.Begin();
+
+            _spriteBatch.FillRectangle(_position, new Vector2(100, 100), Color.Orange);
+
+            _spriteBatch.End();
+
+            base.Draw(gameTime);
+        }
+        #endregion
+
+
+        #region Private Methods
+        /// <summary>
+        /// Updates the physics using the given <paramref name="frameTime"/>.
+        /// </summary>
+        /// <param name="frameTime">The time in seconds since the last frame.</param>
+        private void UpdatePhysics(float frameTime)
+        {
             var allForces = new Vector2();//Total forces.  Gravity + air/fluid drag + etc....
 
             //Add the weight force, which only affects the y-direction (because that's the direction gravity is pulling from)
@@ -195,31 +227,9 @@ namespace GravityTesting
                 _position.Y = _screenHeight - _radius;
             }
 
-            base.Update(gameTime);
         }
 
-
-        /// <summary>
-        /// This is called when the game should draw itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Draw(GameTime gameTime)
-        {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            _spriteBatch.Begin();
-
-            _spriteBatch.FillRectangle(_position, new Vector2(100, 100), Color.Orange);
-
-            _spriteBatch.End();
-
-            base.Draw(gameTime);
-        }
-        #endregion
-
-
-        #region Private Methods
-        private void UpdatePhysics()
+        private void CheckCollision()
         {
 
         }
