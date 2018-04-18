@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using System;
 
 namespace GravityTesting
@@ -17,29 +16,30 @@ namespace GravityTesting
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private Texture2D _box;
         private int _screenHeight;
-        private float _x = 200f;//This is the objects position in the x direction
-        private float _y = 0f;//This is the objects position in the y direction
-        private float _velocityY = 0f; //This is the objects velocity only in the y-direction
-        private float _accelerationY = 0f;//This is the objects acceleration only in the y-direction
-        private float _mass = 0.1f;    // Ball mass in kg
-        private float _radius = 50f;     // Ball radius in cm; or pixels.
-        private float _deltaTime = 0.02f;  // Time step in the units of seconds
+        private int _screenWidth;
+
+        private Vector2 _position = new Vector2(350, 200f);
+        private Vector2 _velocity = new Vector2(0, 0);
+        private Vector2 _acceleration = new Vector2();
+
+        private float _mass = 0.1f;//Ball mass in kg
+        private float _radius = 50f;//Ball radius in cm; or pixels.
+        private float _deltaTime = 0.02f;//Time step in the units of seconds
 
         /*This is the amount(constant) of gravitational pull that earth has.
           This number represents the rate that objects accelerate towards earth at 
           a rate of 9.807 m/s^2(meters/second squared) due to the force of gravity.
          */
-        private float _gravity = 9.807f;
+        private Vector2 _gravity = new Vector2(9.807f, 9.807f);
 
         /* Coefficient of restitution ("bounciness"). Needs to be a negative number for flipping the direction of travel (velocity Y) to move the ball 
            in the opposition direction when it hits a surface. This is what simulates the bouncing effect of an object hitting another object.
         */
         private float _restitutionCoeffecient = -0.5f;
 
-        private float _density = 1.2f;  // Density of air. Try 1000 for water.
-        private float _dragCoeffecient = 0.47f; // Coeffecient of drag for a ball
+        private float _density = 1.2f;//Density of air. Try 1000 for water.
+        private float _dragCoeffecient = 0.47f;//Coeffecient of drag for a ball
 
         /* Frontal area of the ball; divided by 10000 to compensate for the 1px = 1cm relation
            frontal area of the ball is the area of the ball as projected opposite of the direction of motion.
@@ -47,11 +47,11 @@ namespace GravityTesting
            It is the total area of the ball that faces the wind. In short: this is the area that the air is pressing on.
            http://www.softschools.com/formulas/physics/air_resistance_formula/85/
         */
-        private float _A = 0f; 
+        private float _surfaceArea = 0f;
 
         public Main()
         {
-            _A = (float)Math.PI * _radius * _radius / 50000f;
+            _surfaceArea = (float)Math.PI * _radius * _radius / 50000f;
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
@@ -69,6 +69,7 @@ namespace GravityTesting
             _graphics.ApplyChanges();
 
             _screenHeight = _graphics.PreferredBackBufferHeight;
+            _screenWidth = _graphics.PreferredBackBufferWidth;
 
             var screenCenterX = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width / 2;
             var screenCenterY = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height / 2;
@@ -88,8 +89,6 @@ namespace GravityTesting
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            _box = Content.Load<Texture2D>(@"Graphics\OrangeBox");
         }
 
 
@@ -109,7 +108,7 @@ namespace GravityTesting
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            var allForces = 0f;//I think fy stands for force Y
+            var allForces = new Vector2();//Total forces.  Gravity + air/fluid drag + etc....
 
             //Add the weight force, which only affects the y-direction (because that's the direction gravity is pulling from)
             //https://www.wikihow.com/Calculate-Force-of-Gravity
@@ -124,7 +123,7 @@ namespace GravityTesting
                 3. Multiplying _velocityY * _velocityY is the same thing as _velocity^2 which is in the well known equation in the link below
             */
             http://www.softschools.com/formulas/physics/air_resistance_formula/85/
-            allForces += Util.CalculateDragForceOnObject(_density, _dragCoeffecient, _A, _velocityY);
+            allForces += Util.CalculateDragForceOnObject(_density, _dragCoeffecient, _surfaceArea, _velocity);
 
             /* Verlet integration for the y-direction
              * This is the amount the ball will be moving in this frame based on the ball's current velocity and acceleration. 
@@ -133,30 +132,63 @@ namespace GravityTesting
              * Refer to C++ code sample and the velocity_verlet() function
              *      https://leios.gitbooks.io/algorithm-archive/content/chapters/physics_solvers/verlet/verlet.html
             */
-            var predictedDeltaY = Util.IntegrateVelocityVerlet(_velocityY, _deltaTime, _accelerationY);
+            var predictedDelta = Util.IntegrateVelocityVerlet(_velocity, _deltaTime, _acceleration);
 
             // The following calculation converts the unit of measure from cm per pixel to meters per pixel
-            _y += predictedDeltaY * 100f;
+            _position += predictedDelta * 100f;
 
             /*Update the acceleration in the Y direction to take in effect all of the added forces as well as the mass
              Find the new acceleration of the object in the Y direction by solving for A(Accerlation) by dividing all
              0f the net forces by the mass of the object.  This is one way to find out the acceleration.
              */
-            var newAccelerationY = allForces / _mass;
+            var newAcceleration = allForces / _mass;
 
-            var averageAccelerationY = Util.Average(new[] { newAccelerationY, _accelerationY });
+            var averageAcceleration = Util.Average(new[] { newAcceleration, _acceleration });
 
-            _velocityY += averageAccelerationY * _deltaTime;
+            _velocity += averageAcceleration * _deltaTime;
 
-            //Let's do very simple collision detection
-            if (_y + _radius > _screenHeight && _velocityY > 0)
+            //Let's do very simple collision detection for the left of the screen
+            if (_position.X < 0 && _velocity.X < 0)
             {
                 // This is a simplification of impulse-momentum collision response. e should be a negative number, which will change the velocity's direction
-                _velocityY *= _restitutionCoeffecient;
+                _velocity.X *= _restitutionCoeffecient;
 
                 // Move the ball back a little bit so it's not still "stuck" in the wall
                 //This is just for this demo.  This simulates a collision response to separate the ball from the wall.
-                _y = _screenHeight - _radius;
+                _position.X = 0;
+            }
+
+            //Let's do very simple collision detection for the right of the screen
+            if (_position.X + _radius > _screenWidth && _velocity.X > 0)
+            {
+                // This is a simplification of impulse-momentum collision response. e should be a negative number, which will change the velocity's direction
+                _velocity.X *= _restitutionCoeffecient;
+
+                // Move the ball back a little bit so it's not still "stuck" in the wall
+                //This is just for this demo.  This simulates a collision response to separate the ball from the wall.
+                _position.X = _screenWidth - _radius;
+            }
+
+            //Let's do very simple collision detection for the top of the screen
+            if (_position.Y < 0 && _velocity.Y < 0)
+            {
+                // This is a simplification of impulse-momentum collision response. e should be a negative number, which will change the velocity's direction
+                _velocity.Y *= _restitutionCoeffecient;
+
+                // Move the ball back a little bit so it's not still "stuck" in the wall
+                //This is just for this demo.  This simulates a collision response to separate the ball from the wall.
+                _position.Y = 0;
+            }
+
+            //Let's do very simple collision detection for the bottom of the screen
+            if (_position.Y + _radius > _screenHeight && _velocity.Y > 0)
+            {
+                // This is a simplification of impulse-momentum collision response. e should be a negative number, which will change the velocity's direction
+                _velocity.Y *= _restitutionCoeffecient;
+
+                // Move the ball back a little bit so it's not still "stuck" in the wall
+                //This is just for this demo.  This simulates a collision response to separate the ball from the wall.
+                _position.Y = _screenHeight - _radius;
             }
 
             base.Update(gameTime);
@@ -173,7 +205,7 @@ namespace GravityTesting
 
             _spriteBatch.Begin();
 
-            _spriteBatch.Draw(_box, new Vector2(_x, _y), Color.White);
+            _spriteBatch.FillRectangle(_position, new Vector2(100, 100), Color.Orange);
 
             _spriteBatch.End();
 
