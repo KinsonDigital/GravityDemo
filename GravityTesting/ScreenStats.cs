@@ -5,12 +5,19 @@ using System.Collections.Generic;
 
 namespace GravityTesting
 {
+    /// <summary>
+    /// Used to render stats to a screen.
+    /// </summary>
     public class ScreenStats
     {
         private SpriteFont _titleFont;
         private SpriteFont _textFont;
         private List<StatText> _statItems = new List<StatText>();
 
+        /// <summary>
+        /// Create a new instance of <see cref="ScreenStats"/>.
+        /// </summary>
+        /// <param name="contentManager">The content manager to use to load the fonts.</param>
         public ScreenStats(ContentManager contentManager)
         {
             _titleFont = contentManager.Load<SpriteFont>(@"Font\Title");
@@ -18,6 +25,11 @@ namespace GravityTesting
         }
 
 
+        /// <summary>
+        /// Update the stat with the given <paramref name="name"/> to the given <paramref name="text"/>.
+        /// </summary>
+        /// <param name="name">The name of the stat to update.</param>
+        /// <param name="text">The content to update the stat to.</param>
         public void UpdateStat(string name, string text)
         {
             //Find the stat
@@ -32,6 +44,10 @@ namespace GravityTesting
         }
 
 
+        /// <summary>
+        /// Render the screen stats to the screen.
+        /// </summary>
+        /// <param name="spriteBatch">The sprite batch to use to render.</param>
         public void Draw(SpriteBatch spriteBatch)
         {
             for (int i = 0; i < _statItems.Count; i++)
