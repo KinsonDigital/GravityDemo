@@ -7,6 +7,11 @@ namespace GravityTesting
     /// </summary>
     public static class Util
     {
+        public static Point ToPoint(this Vector2 value)
+        {
+            return new Point((int)value.X, (int)value.Y);
+        }
+
         /// <summary>
         /// Square the given <paramref name="value"/> and return he result.
         /// </summary>

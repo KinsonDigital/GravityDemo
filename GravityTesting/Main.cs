@@ -16,7 +16,6 @@ namespace GravityTesting
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private Texture2D _box;
         private int _screenHeight;
         private int _screenWidth;
 
@@ -90,8 +89,6 @@ namespace GravityTesting
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            _box = Content.Load<Texture2D>(@"Graphics\OrangeBox");
         }
 
 
@@ -208,7 +205,7 @@ namespace GravityTesting
 
             _spriteBatch.Begin();
 
-            _spriteBatch.Draw(_box, new Vector2(_position.X, _position.Y), Color.White);
+            _spriteBatch.FillRectangle(_position, new Vector2(100, 100), Color.Orange);
 
             _spriteBatch.End();
 
