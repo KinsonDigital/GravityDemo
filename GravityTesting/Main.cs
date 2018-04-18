@@ -68,6 +68,11 @@ namespace GravityTesting
 
         public Main()
         {
+            var vector = new Vector2(2, 2);
+
+            var result = vector * vector;
+
+            //--------
             _A = (float)Math.PI * _radius * _radius / 50000f;
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";

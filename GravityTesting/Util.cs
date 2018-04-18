@@ -89,11 +89,7 @@ namespace GravityTesting
         //TODO: Convert name of velocityOnSingleAxis param to something that makes sense to the context of a vector
         public static Vector2 CalculateDragForceOnObject(float fluidDensity, float dragCoefficient, float surfaceAreaInContact, Vector2 velocityOnSingleAxis)
         {
-            return new Vector2()
-            {
-                X = -1 * ((fluidDensity * dragCoefficient * surfaceAreaInContact) / 2.0f) * Squared(velocityOnSingleAxis.X),
-                Y = -1 * ((fluidDensity * dragCoefficient * surfaceAreaInContact) / 2.0f) * Squared(velocityOnSingleAxis.Y)
-            };
+            return -1 * ((fluidDensity * dragCoefficient * surfaceAreaInContact) / 2.0f) * (velocityOnSingleAxis * velocityOnSingleAxis);
         }
     }
 }
