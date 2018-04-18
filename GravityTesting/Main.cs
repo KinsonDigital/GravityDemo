@@ -47,11 +47,11 @@ namespace GravityTesting
            It is the total area of the ball that faces the wind. In short: this is the area that the air is pressing on.
            http://www.softschools.com/formulas/physics/air_resistance_formula/85/
         */
-        private float _A = 0f;
+        private float _surfaceArea = 0f;
 
         public Main()
         {
-            _A = (float)Math.PI * _radius * _radius / 50000f;
+            _surfaceArea = (float)Math.PI * _radius * _radius / 50000f;
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
@@ -123,7 +123,7 @@ namespace GravityTesting
                 3. Multiplying _velocityY * _velocityY is the same thing as _velocity^2 which is in the well known equation in the link below
             */
             http://www.softschools.com/formulas/physics/air_resistance_formula/85/
-            allForces += Util.CalculateDragForceOnObject(_density, _dragCoeffecient, _A, _velocity);
+            allForces += Util.CalculateDragForceOnObject(_density, _dragCoeffecient, _surfaceArea, _velocity);
 
             /* Verlet integration for the y-direction
              * This is the amount the ball will be moving in this frame based on the ball's current velocity and acceleration. 
