@@ -32,16 +32,23 @@ namespace GravityTesting
         //private float _velocityY = 0f; //This is the objects velocity only in the y-direction//OLD
         //-----------------------------------
 
-        private float _accelerationY = 0f;//This is the objects acceleration only in the y-direction
+        //-----------------------------------
+        private Vector2 _acceleration = new Vector2();//NEW
+        //private float _accelerationY = 0f;//This is the objects acceleration only in the y-direction//OLD
+        //-----------------------------------
+
         private float _mass = 0.1f;    // Ball mass in kg
         private float _radius = 50f;     // Ball radius in cm; or pixels.
         private float _deltaTime = 0.02f;  // Time step in the units of seconds
 
+        //-----------------------------------
         /*This is the amount(constant) of gravitational pull that earth has.
           This number represents the rate that objects accelerate towards earth at 
           a rate of 9.807 m/s^2(meters/second squared) due to the force of gravity.
          */
-        private float _gravity = 9.807f;
+        private Vector2 _gravity = new Vector2(0, 9.807f);//NEW
+        //private float _gravity = 9.807f;//OLD
+        //-----------------------------------
 
         /* Coefficient of restitution ("bounciness"). Needs to be a negative number for flipping the direction of travel (velocity Y) to move the ball 
            in the opposition direction when it hits a surface. This is what simulates the bouncing effect of an object hitting another object.
@@ -120,7 +127,7 @@ namespace GravityTesting
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            var allForces = 0f;//I think fy stands for force Y
+            var allForces = new Vector2();//I think fy stands for force Y
 
             //Add the weight force, which only affects the y-direction (because that's the direction gravity is pulling from)
             //https://www.wikihow.com/Calculate-Force-of-Gravity
@@ -135,7 +142,7 @@ namespace GravityTesting
                 3. Multiplying _velocityY * _velocityY is the same thing as _velocity^2 which is in the well known equation in the link below
             */
             http://www.softschools.com/formulas/physics/air_resistance_formula/85/
-            allForces += Util.CalculateDragForceOnObject(_density, _dragCoeffecient, _A, _velocity.Y);
+            allForces += Util.CalculateDragForceOnObject(_density, _dragCoeffecient, _A, _velocity);
 
             /* Verlet integration for the y-direction
              * This is the amount the ball will be moving in this frame based on the ball's current velocity and acceleration. 
@@ -144,21 +151,21 @@ namespace GravityTesting
              * Refer to C++ code sample and the velocity_verlet() function
              *      https://leios.gitbooks.io/algorithm-archive/content/chapters/physics_solvers/verlet/verlet.html
             */
-            var predictedDeltaY = Util.IntegrateVelocityVerlet(_velocity.Y, _deltaTime, _accelerationY);
+            var predictedDelta = Util.IntegrateVelocityVerlet(_velocity, _deltaTime, _acceleration);
 
             // The following calculation converts the unit of measure from cm per pixel to meters per pixel
-            _position.Y += predictedDeltaY * 100f;
+            _position += predictedDelta * 100f;
             //_y += predictedDeltaY * 100f;//OLD
 
             /*Update the acceleration in the Y direction to take in effect all of the added forces as well as the mass
              Find the new acceleration of the object in the Y direction by solving for A(Accerlation) by dividing all
              0f the net forces by the mass of the object.  This is one way to find out the acceleration.
              */
-            var newAccelerationY = allForces / _mass;
+            var newAcceleration = allForces / _mass;
 
-            var averageAccelerationY = Util.Average(new[] { newAccelerationY, _accelerationY });
+            var averageAcceleration = Util.Average(new[] { newAcceleration, _acceleration });
 
-            _velocity.Y += averageAccelerationY * _deltaTime;
+            _velocity += averageAcceleration * _deltaTime;
 
             //Let's do very simple collision detection on the Y axis
             if (_position.Y + _radius > _screenHeight && _velocity.Y > 0)

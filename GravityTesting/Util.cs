@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,6 +34,20 @@ namespace GravityTesting
         }
 
 
+        public static Vector2 Average(Vector2[] values)
+        {
+            var sum = Vector2.Zero;
+
+            for (int i = 0; i < values.Length; i++)
+            {
+                sum.X += values[i].X;
+                sum.Y += values[i].Y;
+            }
+
+            return new Vector2(sum.X / values.Length, sum.Y / values.Length);
+        }
+
+
         /// <summary>
         /// This performs a verlet velocity integration on a single axis.
         /// </summary>
@@ -46,9 +61,15 @@ namespace GravityTesting
         /// Other: https://leios.gitbooks.io/algorithm-archive/content/chapters/physics_solvers/verlet/verlet.html
         /// </remarks>
         /// <returns></returns>
-        public static float IntegrateVelocityVerlet(float velOnSingleAxis, float dt, float accelerationOnSingleAxis)
+        //TODO: Convert name of velOnSingleAxis param to something that makes sense to the context of a vector
+        //TODO: Convert name of accelerationOnSingleAxis param to something that makes sense to the context of a vector
+        public static Vector2 IntegrateVelocityVerlet(Vector2 velOnSingleAxis, float dt, Vector2 accelerationOnSingleAxis)
         {
-            return velOnSingleAxis * dt + (0.5f * accelerationOnSingleAxis * Squared(dt));
+            return new Vector2()
+            {
+                X = velOnSingleAxis.X * dt + (0.5f * accelerationOnSingleAxis.X * Squared(dt)),
+                Y = velOnSingleAxis.Y * dt + (0.5f * accelerationOnSingleAxis.Y * Squared(dt))
+            };
         }
 
 
@@ -65,9 +86,14 @@ namespace GravityTesting
         /// 2. https://www.khanacademy.org/computing/computer-programming/programming-natural-simulations/programming-forces/a/air-and-fluid-resistance
         /// </remarks>
         /// <returns></returns>
-        public static float CalculateDragForceOnObject(float fluidDensity, float dragCoefficient, float surfaceAreaInContact, float velocityOnSingleAxis)
+        //TODO: Convert name of velocityOnSingleAxis param to something that makes sense to the context of a vector
+        public static Vector2 CalculateDragForceOnObject(float fluidDensity, float dragCoefficient, float surfaceAreaInContact, Vector2 velocityOnSingleAxis)
         {
-            return -1 * ((fluidDensity * dragCoefficient * surfaceAreaInContact) / 2.0f) * Squared(velocityOnSingleAxis);
+            return new Vector2()
+            {
+                X = -1 * ((fluidDensity * dragCoefficient * surfaceAreaInContact) / 2.0f) * Squared(velocityOnSingleAxis.X),
+                Y = -1 * ((fluidDensity * dragCoefficient * surfaceAreaInContact) / 2.0f) * Squared(velocityOnSingleAxis.Y)
+            };
         }
     }
 }
