@@ -292,7 +292,7 @@ namespace GravityTesting
                     ChangeAmount = 0.01f,
                     ChangeAction = (float amount) =>
                     {
-                        _restitutionCoeffecient += amount;
+                        _restitutionCoeffecient = (float)Math.Round(_restitutionCoeffecient + amount, 2);
                     }
                 },
                 new Setting()
@@ -302,7 +302,7 @@ namespace GravityTesting
                     ChangeAmount = 0.01f,
                     ChangeAction = (float amount) =>
                     {
-                        _restitutionCoeffecient -= amount;
+                        _restitutionCoeffecient = (float)Math.Round(_restitutionCoeffecient - amount, 2);
                     }
                 },
             };
