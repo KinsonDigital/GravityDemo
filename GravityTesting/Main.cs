@@ -38,7 +38,7 @@ namespace GravityTesting
         /* Coefficient of restitution ("bounciness"). Needs to be a negative number for flipping the direction of travel (velocity Y) to move the ball 
            in the opposition direction when it hits a surface. This is what simulates the bouncing effect of an object hitting another object.
         */
-        private float _restitutionCoeffecient = -0.5f;
+        private float _restitutionCoeffecient = -1.65f;
 
         private float _density = 1.2f;//Density of air. Try 1000 for water.
         private float _dragCoeffecient = 0.47f;//Coeffecient of drag for a ball
@@ -94,6 +94,9 @@ namespace GravityTesting
             //Add the various settings to the settings manager
             AddSettings();
 
+            //Create screen stats
+            CreateScreenStats();
+
             base.Initialize();
         }
 
@@ -105,33 +108,6 @@ namespace GravityTesting
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            _screenStats = new ScreenStats(Content);
-            _screenStats.AddStatText(new StatText()
-            {
-                Name = "Velocity",
-                Text = "X: 0, Y: 0",
-                Forecolor = Color.Black,
-                Position = new Vector2(0, _screenHeight - 25)
-            });
-
-            _screenStats.AddStatText(new StatText()
-            {
-                Name = "Gravity",
-                Text = "X: 0, Y: 0",
-                Forecolor = Color.Black,
-                SelectedColor = Color.Yellow,
-                Selected = true,
-                Position = new Vector2(0, 0)
-            });
-
-            _screenStats.AddStatText(new StatText()
-            {
-                Name = "Bounciness",
-                Text = _restitutionCoeffecient.ToString(),
-                Forecolor = Color.Black,
-                Position = new Vector2(0, 25)
-            });
         }
 
 
@@ -308,6 +284,66 @@ namespace GravityTesting
             };
 
             _settingsManager.AddSettingGroup("Bounciness", bouncinessSettings);
+
+            var dragSettings = new[]
+            {
+                new Setting()
+                {
+                    Name = "DragIncrease",
+                    InvokeActionKey = Keys.Up,
+                    ChangeAmount = 1f,
+                    ChangeAction = (float amount) =>
+                    {
+                        _dragCoeffecient = (float)Math.Round(_dragCoeffecient + amount, 2);
+                    }
+                },
+                new Setting()
+                {
+                    Name = "DragDecrease",
+                    InvokeActionKey = Keys.Down,
+                    ChangeAmount = 1f,
+                    ChangeAction = (float amount) =>
+                    {
+                        _dragCoeffecient = (float)Math.Round(_dragCoeffecient - amount, 2);
+                    }
+                }
+            };
+
+            _settingsManager.AddSettingGroup("Drag", dragSettings);
+        }
+
+
+        /// <summary>
+        /// Creates all of the screen stats to be shown on the screen.
+        /// </summary>
+        private void CreateScreenStats()
+        {
+            _screenStats = new ScreenStats(Content);
+            _screenStats.AddStatText(new StatText()
+            {
+                Name = "Velocity",
+                Text = "X: 0, Y: 0",
+                Forecolor = Color.Black,
+                Position = new Vector2(0, _screenHeight - 25)
+            });
+
+            _screenStats.AddStatText(new StatText()
+            {
+                Name = "Gravity",
+                Text = "X: 0, Y: 0",
+                Forecolor = Color.Black,
+                SelectedColor = Color.Yellow,
+                Selected = true,
+                Position = new Vector2(0, 0)
+            });
+
+            _screenStats.AddStatText(new StatText()
+            {
+                Name = "Bounciness",
+                Text = _restitutionCoeffecient.ToString(),
+                Forecolor = Color.Black,
+                Position = new Vector2(0, 25)
+            });
         }
 
 
@@ -361,6 +397,7 @@ namespace GravityTesting
 
             _velocity = Util.Clamp(_velocity, -2f, 2f);
         }
+
 
         /// <summary>
         /// Checks collision with the edges of the screen.
