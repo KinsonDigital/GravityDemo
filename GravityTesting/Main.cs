@@ -334,6 +334,9 @@ namespace GravityTesting
             http://www.softschools.com/formulas/physics/air_resistance_formula/85/
             allForces += Util.CalculateDragForceOnObject(_density, _dragCoeffecient, _surfaceArea, _velocity);
 
+            //Clamp the total forces
+            allForces = Util.Clamp(allForces, -10f, 10f);
+
             /* Verlet integration for the y-direction
              * This is the amount the ball will be moving in this frame based on the ball's current velocity and acceleration. 
              * Part 1: https://www.youtube.com/watch?v=3HjO_RGIjCU
@@ -355,6 +358,8 @@ namespace GravityTesting
             var averageAcceleration = Util.Average(new[] { newAcceleration, _acceleration });
 
             _velocity += averageAcceleration * frameTime;
+
+            _velocity = Util.Clamp(_velocity, -2f, 2f);
         }
 
         /// <summary>
