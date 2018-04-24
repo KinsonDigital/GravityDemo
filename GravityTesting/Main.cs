@@ -154,6 +154,7 @@ namespace GravityTesting
             _screenStats.UpdateStat("Velocity", $"X: {velX} , Y:{velY}");
             _screenStats.UpdateStat("Bounciness", $"{_restitutionCoeffecient}");
             _screenStats.UpdateStat("Drag", $"{_dragCoeffecient}");
+            _screenStats.UpdateStat("Fluid Density", $"{_fluidDensity}");
         }
 
 
@@ -345,6 +346,14 @@ namespace GravityTesting
                 Text = "N/A",
                 Forecolor = Color.Black,
                 Position = new Vector2(0, 50)
+            });
+
+            _screenStats.AddStatText(new StatText()
+            {
+                Name = "FluidDensity",
+                Text = "N/A",
+                Forecolor = Color.Black,
+                Position = new Vector2(0, 75)
             });
 
             _screenStats.AddStatText(new StatText()
