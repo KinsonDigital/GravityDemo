@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 
 namespace GravityTesting
@@ -14,6 +15,7 @@ namespace GravityTesting
     /// </summary>
     public class Main : Game
     {
+        private SettingsManager _settingsManager;
         private ScreenStats _screenStats;
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
@@ -31,7 +33,7 @@ namespace GravityTesting
           This number represents the rate that objects accelerate towards earth at 
           a rate of 9.807 m/s^2(meters/second squared) due to the force of gravity.
          */
-        private Vector2 _gravity = new Vector2(9.807f, 9.807f);
+        private Vector2 _gravity = new Vector2(0f, 0f);
 
         /* Coefficient of restitution ("bounciness"). Needs to be a negative number for flipping the direction of travel (velocity Y) to move the ball 
            in the opposition direction when it hits a surface. This is what simulates the bouncing effect of an object hitting another object.
@@ -49,15 +51,23 @@ namespace GravityTesting
         */
         private float _surfaceArea = 0f;
 
+
+        #region Constructors
+        /// <summary>
+        /// Creates a new instance of <see cref="Main"/>.
+        /// </summary>
         public Main()
         {
             //Make this game loop a variable time step
             IsFixedTimeStep = false;
+            IsMouseVisible = true;
 
             _surfaceArea = (float)Math.PI * _radius * _radius / 50000f;
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
+        #endregion
+
 
         #region MonoGame Methods
         /// <summary>
@@ -81,6 +91,9 @@ namespace GravityTesting
 
             Window.Position = new Point(screenCenterX - halfWidth, screenCenterY - halfHeight);
 
+            //Add the various settings to the settings manager
+            AddSettings();
+
             base.Initialize();
         }
 
@@ -91,15 +104,34 @@ namespace GravityTesting
         /// </summary>
         protected override void LoadContent()
         {
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
+
             _screenStats = new ScreenStats(Content);
             _screenStats.AddStatText(new StatText()
             {
                 Name = "Velocity",
                 Text = "X: 0, Y: 0",
-                Forecolor = Color.Black
+                Forecolor = Color.Black,
+                Position = new Vector2(0, _screenHeight - 25)
             });
 
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            _screenStats.AddStatText(new StatText()
+            {
+                Name = "Gravity",
+                Text = "X: 0, Y: 0",
+                Forecolor = Color.Black,
+                SelectedColor = Color.Yellow,
+                Selected = true,
+                Position = new Vector2(0, 0)
+            });
+
+            _screenStats.AddStatText(new StatText()
+            {
+                Name = "Bounciness",
+                Text = _restitutionCoeffecient.ToString(),
+                Forecolor = Color.Black,
+                Position = new Vector2(0, 25)
+            });
         }
 
 
@@ -127,12 +159,24 @@ namespace GravityTesting
 
             UpdateStats();
 
+            _settingsManager.Update(gameTime);
+
             base.Update(gameTime);
         }
 
+
+        /// <summary>
+        /// Updates the stat values on the screen.
+        /// </summary>
         private void UpdateStats()
         {
-            _screenStats.UpdateStat("Velocity", $"X: {Math.Round(_velocity.X, 2)} , Y:{Math.Round(_velocity.Y, 2)}");
+            //If the velocity is infinity, just set text to N/A
+            var velX = float.IsInfinity(_velocity.X) ? "Inf" : Math.Round(_velocity.X, 2).ToString();
+            var velY = float.IsInfinity(_velocity.Y) ? "Inf" : Math.Round(_velocity.Y, 2).ToString();
+
+            _screenStats.UpdateStat("Gravity", $"X: {Math.Round(_gravity.X, 2)} , Y:{Math.Round(_gravity.Y, 2)}");
+            _screenStats.UpdateStat("Velocity", $"X: {velX} , Y:{velY}");
+            _screenStats.UpdateStat("Bounciness", $"{_restitutionCoeffecient}");
         }
 
 
@@ -157,7 +201,116 @@ namespace GravityTesting
         #endregion
 
 
+        #region Event Methods
+        /// <summary>
+        /// Invoked when the setting has been moved to the next setting.
+        /// </summary>
+        /// <param name="sender">The event object.</param>
+        /// <param name="e">The event args.</param>
+        private void _settingsManager_OnNextSetting(object sender, ChangeSettingEventArgs e)
+        {
+            _screenStats.UnselectAll();
+            _screenStats.SelectedStat(e.CurrentSettingGroupName);
+        }
+
+
+        /// <summary>
+        /// Invoked when the setting has been moved to the previous setting.
+        /// </summary>
+        /// <param name="sender">The event object.</param>
+        /// <param name="e">The event args.</param>
+        private void _settingsManager_OnPreviousSetting(object sender, ChangeSettingEventArgs e)
+        {
+            _screenStats.UnselectAll();
+            _screenStats.SelectedStat(e.CurrentSettingGroupName);
+        }
+        #endregion
+
+
         #region Private Methods
+        /// <summary>
+        /// Adds all of the various settings to be manipulated to the settings manager.
+        /// </summary>
+        private void AddSettings()
+        {
+            _settingsManager = new SettingsManager(Keys.End, Keys.Home);
+            _settingsManager.OnNextSetting += _settingsManager_OnNextSetting;
+            _settingsManager.OnPreviousSetting += _settingsManager_OnPreviousSetting;
+
+            var gravitySettings = new[]
+            {
+                new Setting()
+                {
+                    Name = "GravityRight",
+                    InvokeActionKey = Keys.Right,
+                    ChangeAmount = 1,
+                    ChangeAction = (float amount) =>
+                    {
+                        _gravity.X += amount;
+                    }
+                },
+                new Setting()
+                {
+                    Name = "GravityLeft",
+                    InvokeActionKey = Keys.Left,
+                    ChangeAmount = 1,
+                    ChangeAction = (float amount) =>
+                    {
+                        _gravity.X -= amount;
+                    }
+                },
+                new Setting()
+                {
+                    Name = "GravityDown",
+                    InvokeActionKey = Keys.Down,
+                    ChangeAmount = 1,
+                    ChangeAction = (float amount) =>
+                    {
+                        _gravity.Y += amount;
+                    }
+                },
+                new Setting()
+                {
+                    Name = "GravityUp",
+                    InvokeActionKey = Keys.Up,
+                    ChangeAmount = 1,
+                    ChangeAction = (float amount) =>
+                    {
+                        _gravity.Y -= amount;
+                    }
+                }
+            };
+
+            _settingsManager.AddSettingGroup("Gravity", gravitySettings);
+
+            var bouncinessSettings = new[]
+            {
+                new Setting()
+                {
+                    Name = "IncreaseBounciness",
+                    InvokeActionKey = Keys.Up,
+                    ChangeAmount = 0.01f,
+                    ChangeAction = (float amount) =>
+                    {
+                        _restitutionCoeffecient += amount;
+                    }
+                },
+                new Setting()
+                {
+                    Name = "DecreaseBounciness",
+                    InvokeActionKey = Keys.Down,
+                    ChangeAmount = 0.01f,
+                    ChangeAction = (float amount) =>
+                    {
+                        _restitutionCoeffecient -= amount;
+                    }
+                },
+            };
+
+            _settingsManager.AddSettingGroup("Bounciness", bouncinessSettings);
+        }
+
+
         /// <summary>
         /// Updates the physics using the given <paramref name="frameTime"/>.
         /// </summary>
@@ -221,14 +374,14 @@ namespace GravityTesting
             }
 
             //Let's do very simple collision detection for the right of the screen
-            if (_position.X + _radius > _screenWidth && _velocity.X > 0)
+            if (_position.X + (_radius * 2) > _screenWidth && _velocity.X > 0)
             {
                 // This is a simplification of impulse-momentum collision response. e should be a negative number, which will change the velocity's direction
                 _velocity.X *= _restitutionCoeffecient;
 
                 // Move the ball back a little bit so it's not still "stuck" in the wall
                 //This is just for this demo.  This simulates a collision response to separate the ball from the wall.
-                _position.X = _screenWidth - _radius;
+                _position.X = _screenWidth - (_radius * 2);
             }
 
             //Let's do very simple collision detection for the top of the screen
@@ -243,14 +396,14 @@ namespace GravityTesting
             }
 
             //Let's do very simple collision detection for the bottom of the screen
-            if (_position.Y + _radius > _screenHeight && _velocity.Y > 0)
+            if (_position.Y + (_radius * 2) > _screenHeight && _velocity.Y > 0)
             {
                 // This is a simplification of impulse-momentum collision response. e should be a negative number, which will change the velocity's direction
                 _velocity.Y *= _restitutionCoeffecient;
 
                 // Move the ball back a little bit so it's not still "stuck" in the wall
                 //This is just for this demo.  This simulates a collision response to separate the ball from the wall.
-                _position.Y = _screenHeight - _radius;
+                _position.Y = _screenHeight - (_radius * 2);
             }
         }
         #endregion
