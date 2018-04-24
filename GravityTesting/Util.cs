@@ -42,6 +42,38 @@ namespace GravityTesting
 
 
         /// <summary>
+        /// Clamps the given <paramref name="value"/> between the given <paramref name="minimum"/> and <paramref name="maximum"/> values.
+        /// </summary>
+        /// <param name="value">The value to clamp.</param>
+        /// <param name="minimum">The minimum that the value should be.</param>
+        /// <param name="maximum">The maximum that the value should be.</param>
+        /// <returns></returns>
+        public static float Clamp(float value, float minimum, float maximum)
+        {
+            value = value < minimum ? minimum : value;
+            value = value > maximum ? maximum : value;
+
+            return value;
+        }
+
+
+        /// <summary>
+        /// Clamps the given <paramref name="value"/> between the given <paramref name="minimum"/> and <paramref name="maximum"/> values.
+        /// </summary>
+        /// <param name="value">The value to clamp.</param>
+        /// <param name="minimum">The minimum that the value should be.</param>
+        /// <param name="maximum">The maximum that the value should be.</param>
+        /// <returns></returns>
+        public static Vector2 Clamp(Vector2 value, float minimum, float maximum)
+        {
+            value.X = Clamp(value.X, minimum, maximum);
+            value.Y = Clamp(value.Y, minimum, maximum);
+
+            return value;
+        }
+
+
+        /// <summary>
         /// Returns an average of all the given <paramref name="values"/> of type <see cref="Vector2"/>.
         /// </summary>
         /// <param name="values">The list of vectors to average.</param>
