@@ -153,6 +153,7 @@ namespace GravityTesting
             _screenStats.UpdateStat("Gravity", $"X: {Math.Round(_gravity.X, 2)} , Y:{Math.Round(_gravity.Y, 2)}");
             _screenStats.UpdateStat("Velocity", $"X: {velX} , Y:{velY}");
             _screenStats.UpdateStat("Bounciness", $"{_restitutionCoeffecient}");
+            _screenStats.UpdateStat("Drag", $"{_dragCoeffecient}");
         }
 
 
@@ -319,13 +320,6 @@ namespace GravityTesting
         private void CreateScreenStats()
         {
             _screenStats = new ScreenStats(Content);
-            _screenStats.AddStatText(new StatText()
-            {
-                Name = "Velocity",
-                Text = "X: 0, Y: 0",
-                Forecolor = Color.Black,
-                Position = new Vector2(0, _screenHeight - 25)
-            });
 
             _screenStats.AddStatText(new StatText()
             {
@@ -340,9 +334,25 @@ namespace GravityTesting
             _screenStats.AddStatText(new StatText()
             {
                 Name = "Bounciness",
-                Text = _restitutionCoeffecient.ToString(),
+                Text = "N/A",
                 Forecolor = Color.Black,
                 Position = new Vector2(0, 25)
+            });
+
+            _screenStats.AddStatText(new StatText()
+            {
+                Name = "Drag",
+                Text = "N/A",
+                Forecolor = Color.Black,
+                Position = new Vector2(0, 50)
+            });
+
+            _screenStats.AddStatText(new StatText()
+            {
+                Name = "Velocity",
+                Text = "X: 0, Y: 0",
+                Forecolor = Color.Black,
+                Position = new Vector2(0, _screenHeight - 25)
             });
         }
 
