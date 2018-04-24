@@ -27,7 +27,7 @@ namespace GravityTesting
         private Vector2 _acceleration = new Vector2();
 
         private float _mass = 0.1f;//Ball mass in kg
-        private float _radius = 50f;//Ball radius in cm; or pixels.
+        private float _radius = 50f;//Ball radius in cm or pixels.
 
         /*This is the amount(constant) of gravitational pull that earth has.
           This number represents the rate that objects accelerate towards earth at 
@@ -38,10 +38,10 @@ namespace GravityTesting
         /* Coefficient of restitution ("bounciness"). Needs to be a negative number for flipping the direction of travel (velocity Y) to move the ball 
            in the opposition direction when it hits a surface. This is what simulates the bouncing effect of an object hitting another object.
         */
-        private float _restitutionCoeffecient = -1.65f;
+        private float _restitutionCoeffecient = 0f;
 
-        private float _fluidDensity = 1.2f;//Density of air/fluid. Try 1000 for water.
-        private float _dragCoeffecient = 0.47f;//Coeffecient of drag for a ball
+        private float _fluidDensity = 0f;//Density of air/fluid. Try 1000 for water.
+        private float _dragCoeffecient = 0f;//Coeffecient of drag for on a object
 
         /* Frontal area of the ball; divided by 10000 to compensate for the 1px = 1cm relation
            frontal area of the ball is the area of the ball as projected opposite of the direction of motion.
@@ -154,7 +154,7 @@ namespace GravityTesting
             _screenStats.UpdateStat("Velocity", $"X: {velX} , Y:{velY}");
             _screenStats.UpdateStat("Bounciness", $"{_restitutionCoeffecient}");
             _screenStats.UpdateStat("Drag", $"{_dragCoeffecient}");
-            _screenStats.UpdateStat("Fluid Density", $"{_fluidDensity}");
+            _screenStats.UpdateStat("FluidDensity", $"{_fluidDensity}");
         }
 
 
@@ -312,6 +312,32 @@ namespace GravityTesting
             };
 
             _settingsManager.AddSettingGroup("Drag", dragSettings);
+
+            var fluidDensitySettings = new[]
+{
+                new Setting()
+                {
+                    Name = "FluidDensityIncrease",
+                    InvokeActionKey = Keys.Up,
+                    ChangeAmount = 1f,
+                    ChangeAction = (float amount) =>
+                    {
+                        _fluidDensity = (float)Math.Round(_fluidDensity + amount, 2);
+                    }
+                },
+                new Setting()
+                {
+                    Name = "FluidDensityDragDecrease",
+                    InvokeActionKey = Keys.Down,
+                    ChangeAmount = 1f,
+                    ChangeAction = (float amount) =>
+                    {
+                        _fluidDensity = (float)Math.Round(_fluidDensity - amount, 2);
+                    }
+                }
+            };
+
+            _settingsManager.AddSettingGroup("FluidDensity", fluidDensitySettings);
         }
 
 
