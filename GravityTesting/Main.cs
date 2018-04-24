@@ -40,7 +40,7 @@ namespace GravityTesting
         */
         private float _restitutionCoeffecient = -1.65f;
 
-        private float _density = 1.2f;//Density of air. Try 1000 for water.
+        private float _fluidDensity = 1.2f;//Density of air/fluid. Try 1000 for water.
         private float _dragCoeffecient = 0.47f;//Coeffecient of drag for a ball
 
         /* Frontal area of the ball; divided by 10000 to compensate for the 1px = 1cm relation
@@ -378,7 +378,7 @@ namespace GravityTesting
                 3. Multiplying _velocityY * _velocityY is the same thing as _velocity^2 which is in the well known equation in the link below
             */
             http://www.softschools.com/formulas/physics/air_resistance_formula/85/
-            allForces += Util.CalculateDragForceOnObject(_density, _dragCoeffecient, _surfaceArea, _velocity);
+            allForces += Util.CalculateDragForceOnObject(_fluidDensity, _dragCoeffecient, _surfaceArea, _velocity);
 
             //Clamp the total forces
             allForces = Util.Clamp(allForces, -10f, 10f);
